@@ -19,6 +19,10 @@ function get_quote()
         return $_SESSION['quote'] =
             [
                 'number' => rand(111111, 999999),
+                'nit' => '',
+                'provider_name' => '',
+                'provider_company' => '',
+                'provider_email' => '',
                 'name' => '',
                 'company' => '',
                 'email' => '',
@@ -40,6 +44,15 @@ function set_client($client)
     $_SESSION['quote']['name'] = trim($client['nombre']); //Se actualiza el nombre del cliente
     $_SESSION['quote']['company'] = trim($client['empresa']); //Se actualiza la empresa del cliente
     $_SESSION['quote']['email'] = trim($client['email']); //Se actualiza el email del cliente
+    return true;
+}
+
+function set_provider($provider)
+{
+    $_SESSION['quote']['nit'] = trim($provider['nit']);
+    $_SESSION['quote']['provider_name'] = trim($provider['nombre_proveedor']);
+    $_SESSION['quote']['provider_company'] = trim($provider['empresa_proveedor']);
+    $_SESSION['quote']['provider_email'] = trim($provider['email_proveedor']);
     return true;
 }
 
@@ -79,6 +92,10 @@ function restart()
     $_SESSION['quote'] =
         [
             'number' => rand(111111, 999999),
+            'nit' => '',
+            'provider_name' => '',
+            'provider_company' => '',
+            'provider_email' => '',
             'name' => '',
             'company' => '',
             'email' => '',
@@ -367,11 +384,14 @@ function generate_pdf($filename = null, $html, $save_to_file = true)
 
 function hook_generate_quote()
 {
-    if (!isset($_POST['nombre'], $_POST['empresa'], $_POST['email'])) {
+    if (!isset($_POST['nombre'], $_POST['empresa'], $_POST['email'], $_POST['nit'], $_POST['nombre_proveedor'], $_POST['empresa_proveedor'], $_POST['email_proveedor'])) {
         return json_output(json_build(400, null, 'Parametros incompletos.')); //Si no se envian los datos necesarios se retorna un error
     }
 
     if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+        return json_output(json_build(400, null, 'Email invalido.')); //Si el email no es valido se retorna un error
+    }
+    if (!filter_var($_POST['email_proveedor'], FILTER_VALIDATE_EMAIL)) {
         return json_output(json_build(400, null, 'Email invalido.')); //Si el email no es valido se retorna un error
     }
 
@@ -381,6 +401,14 @@ function hook_generate_quote()
         'email' => trim($_POST['email'])
     ];
 
+    $provider = [
+        'nit' => trim($_POST['nit']),
+        'nombre_proveedor' => trim($_POST['nombre_proveedor']),
+        'empresa_proveedor' => trim($_POST['empresa_proveedor']),
+        'email_proveedor' => trim($_POST['email_proveedor'])
+    ];
+
+    set_provider($provider); //Se actualiza el proveedor
     set_client($client); //Se actualiza el cliente
 
     $quote = get_quote(); //Se obtiene la cotizacion
@@ -392,7 +420,8 @@ function hook_generate_quote()
     $module = MODULES . 'pdf_template'; //Se obtiene el modulo pdf_template
     $html = get_module($module, $quote); //Se obtiene el modulo pdf_template y se le pasa la cotizacion
     $filename = 'coty_' . $quote['number']; //Se establece el nombre del archivo
-    $download = WEB_URL . UPLOADS . $filename . '.pdf'; //Se establece la ruta de descarga
+    // $download = WEB_URL . UPLOADS . $filename . '.pdf'; //Se establece la ruta de descarga
+    $download = sprintf(WEB_URL . 'pdf.php?number=%s', $quote['number']); //Se establece la ruta de descarga
     $quote['url'] = $download; //Se actualiza la cotizacion con la ruta de descarga
 
     if (!generate_pdf(UPLOADS . $filename, $html)) { //Si no se genera el pdf
@@ -400,4 +429,15 @@ function hook_generate_quote()
     }
 
     return json_output(json_build(200, $quote, 'PDF generado con éxito.')); //Se retorna un mensaje de exito
+}
+
+function get_all_quotes()
+{
+    return $quotes = glob(UPLOADS . 'coty_*.pdf'); //Se obtienen todas las cotizaciones
+}
+
+function redirect($route)
+{
+    header(sprintf('Location: %s', $route)); //Se redirecciona a la ruta pasada por parametro
+    exit(); //Se finaliza la ejecucion del script
 }

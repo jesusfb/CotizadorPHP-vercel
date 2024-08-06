@@ -25,7 +25,7 @@ define('JS', WEB_URL . 'assets/js/'); //Ruta de la carpeta js
 
 //Personalización
 define('APP_NAME', 'Cotizador App'); //Nombre de la aplicacion
-define('TAXES_RATE', 16); //Tasa de impuestos
+define('TAXES_RATE', 19); //Tasa de impuestos
 define('SHIPPING', 99.50); //Costo de envio
 
 //Autoload Composer

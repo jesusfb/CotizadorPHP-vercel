@@ -13,6 +13,7 @@
 
         table {
             font-size: x-small;
+            margin-bottom: 25px;
         }
 
         tfoot tr td {
@@ -42,13 +43,11 @@
             <td valign="top"><img src="<?php echo 'assets/img/logo.png'; ?>" alt="Logo cotización" width="70" />
             </td>
             <td align="right">
+                <h4 style="color:red;"><?php echo sprintf("#%s", $d->number); ?></h4>
+                <h4><?php echo date("Y-m-d") ?></h4>
                 <h2>Cotización</h2>
                 <pre>
-                    Jhon Doe
-                    Joystick
-                    xx1010101010
-                    5515 4515 4526
-                    FAX
+                <?php echo sprintf('%s <br> %s <br> %s <br>%s <br>', $d->nit, $d->provider_name, $d->provider_company, $d->provider_email) ?>
                 </pre>
             </td>
         </tr>
@@ -57,8 +56,8 @@
     <!-- Información de la empresa -->
     <table width="100%">
         <tr>
-            <td><strong>De:</strong> Jhon Doe - Joystick</td>
-            <td><strong>Para:</strong> <?php echo sprintf('%s - %s (%s)', $d->name, $d->company, $d->email) ?></td>
+            <td><strong>De: </strong><?php echo sprintf('%s - %s', $d->provider_name, $d->provider_company) ?></td>
+            <td><strong>Para: </strong> <?php echo sprintf('%s - %s (%s)', $d->name, $d->company, $d->email) ?></td>
         </tr>
     </table>
 

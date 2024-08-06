@@ -4,6 +4,7 @@
         <img src="<?php echo IMG . "empty.webp"; ?>" alt="sin contenido" class="img-fluid" style="width:150px;">
     </div>
 <?php else : ?>
+    <h5 class="text-danger"><?php echo sprintf("Cotización #%s", $d->number); ?></h5>
     <div class="table-responsive">
         <table class="table table-hover table-striped table-bordered">
             <thead>

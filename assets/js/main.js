@@ -49,9 +49,9 @@ $("document").ready(() => {
           email.val(res.data.quote.email);
           wrapper.html(res.data.html);
         } else {
-          nombre.val("");
-          company.val("");
-          email.val("");
+          // nombre.val("");
+          // company.val("");
+          // email.val("");
           wrapper.html(res.message);
         }
       })
@@ -129,6 +129,9 @@ $("document").ready(() => {
     e.preventDefault();
     let button = $(this),
       action = "restart_quote";
+    download = $("#download_quote");
+    generate = $("#generate_quote");
+    default_text = "Generar cotización";
 
     if (!confirm("¿Estás seguro de reiniciar la cotización?")) return false;
     $.ajax({
@@ -137,14 +140,12 @@ $("document").ready(() => {
       dataType: "json",
       cache: false,
       data: { action },
-      beforeSend: () => {
-        $(".wrapper_quote").waitMe({
-          effect: "facebook",
-        });
-      },
     })
       .done((res) => {
         if (res.status === 200) {
+          download.fadeOut();
+          download.attr("href", "");
+          generate.html(default_text);
           notify(res.message);
           get_quote();
         } else {
@@ -154,9 +155,7 @@ $("document").ready(() => {
       .fail((err) => {
         notify("Ocurrió un error, recarga la página.", "danger");
       })
-      .always(() => {
-        $(".wrapper_quote").waitMe("hide");
-      });
+      .always(() => {});
   }
 
   $("body").on("click", ".delete_concept", delete_concept);
@@ -388,12 +387,14 @@ $("document").ready(() => {
       .done((res) => {
         if (res.status === 200) {
           notify(res.message);
+          download.attr("href", res.data.url);
           download.fadeIn();
           send.fadeIn();
           button.html(new_text);
           get_quote();
         } else {
           notify(res.message, "danger");
+          download.attr("href", "");
           download.fadeOut();
           send.fadeOut();
           button.html("Reintentar");
